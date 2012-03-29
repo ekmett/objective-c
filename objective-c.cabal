@@ -9,8 +9,8 @@ maintainer:    Edward A. Kmett <ekmett@gmail.com>
 stability:     experimental
 homepage:      http://github.com/ekmett/objective-c/
 copyright:     Copyright (C) 2012 Edward A. Kmett
-synopsis:      Simple 64-bit Objective C 2.0 Bindings
-description:   Simple 64-bit Objective C 2.0 Bindings
+synopsis:      Toy 64-bit Objective C 2.0 Bindings
+description:   Toy 64-bit Objective C 2.0 Bindings
 build-type:    Simple
 
 source-repository head
@@ -25,9 +25,9 @@ library
 
   exposed-modules:
     Objective.C.Prim
+    Objective.C.Runtime
     Objective.C.Fun.TH
     Objective.C.Fun
-    Objective.C.Runtime
 
   include-dirs: cbits
 
