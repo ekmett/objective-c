@@ -26,8 +26,8 @@ library
   exposed-modules:
     Objective.C.Prim
     Objective.C.Runtime
-    Objective.C.Fun.TH
-    Objective.C.Fun
+   -- Objective.C.Fun.TH
+   -- Objective.C.Fun
 
   include-dirs: cbits
 
