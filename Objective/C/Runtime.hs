@@ -3,7 +3,6 @@
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE DefaultSignatures #-}
--- {-# LANGUAGE PolyKinds, ConstraintKinds, DataKinds, KindSignatures, FlexibleInstances, ExtendedDefaultRules #-}
 module Objective.C.Runtime
   (
   -- * Classes
@@ -33,9 +32,8 @@ import Foreign.C.Types
 import Foreign.ForeignPtr
 import Foreign.ForeignPtr.Unsafe as Unsafe
 import Foreign.Ptr
--- import GHC.Prim
-import Text.Read
 import Objective.C.Prim
+import Text.Read
 
 newtype Class = Class { classPtr :: Ptr ObjcClass } deriving (Eq,Ord,Data,Typeable)
 instance Hashable Class where

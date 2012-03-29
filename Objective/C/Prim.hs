@@ -45,8 +45,10 @@ type CId = Ptr ObjcObject
 -- | An objective C 'id' with potential finalizers
 type ForeignId = ForeignPtr ObjcObject
 
+-- | an opaque objective c class struct
 data ObjcClass deriving Typeable
 type CClass = Ptr ObjcClass
 
+-- | an opaque objective c ivar struct
 data ObjcIvar deriving Typeable
 type CIvar = Ptr ObjcIvar
