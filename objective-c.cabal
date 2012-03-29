@@ -1,0 +1,42 @@
+name:          objective-c
+category:      Foreign
+version:       0.1
+license:       BSD3
+cabal-version: >= 1.6
+license-file:  LICENSE
+author:        Edward A. Kmett
+maintainer:    Edward A. Kmett <ekmett@gmail.com>
+stability:     experimental
+homepage:      http://github.com/ekmett/objective-c/
+copyright:     Copyright (C) 2012 Edward A. Kmett
+synopsis:      Simple 64-bit Objective C 2.0 Bindings
+description:   Simple 64-bit Objective C 2.0 Bindings
+build-type:    Simple
+
+source-repository head
+  type: git
+  location: git://github.com/ekmett/objective-c.git
+
+library
+  build-depends:
+    base             >= 4.5     && < 5,
+    template-haskell >= 2.7     && < 2.8,
+    hashable         >= 1.1.2.2 && < 1.2
+
+  exposed-modules:
+    Objective.C.Prim
+    Objective.C.Fun.TH
+    Objective.C.Fun
+    Objective.C.Runtime
+
+  include-dirs: cbits
+
+  includes:
+    cbits/objc_object.h
+    cbits/objc_nsobject.h
+
+  c-sources:
+    cbits/objc_object.c
+    cbits/objc_nsobject.c
+
+  ghc-options: -Wall
