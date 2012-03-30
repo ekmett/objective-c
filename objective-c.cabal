@@ -24,10 +24,15 @@ library
     hashable         >= 1.1.2.2 && < 1.2
 
   exposed-modules:
+    Objective.C
     Objective.C.Prim
-    Objective.C.Runtime
-   -- Objective.C.Fun.TH
-   -- Objective.C.Fun
+    Objective.C.Protocol
+    Objective.C.Class
+    Objective.C.ClassPair
+    Objective.C.Object
+    Objective.C.Id
+    Objective.C.Selector
+    Objective.C.Util
 
   include-dirs: cbits
 

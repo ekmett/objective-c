@@ -1,20 +1,21 @@
 {-# LANGUAGE EmptyDataDecls #-}
 {-# LANGUAGE DeriveDataTypeable #-}
--- {-# LANGUAGE PolyKinds, ConstraintKinds, DataKinds, KindSignatures, FlexibleInstances, ExtendedDefaultRules, EmptyDataDecls 
 -- | Primitive types used for FFI to objective C
 module Objective.C.Prim
   (
   -- * Objective-C Primitives
+  -- ** Booleans
+    CBool, toBool, fromBool
   -- ** Identities
-    ForeignId, CId, ObjcObject
+  , ForeignId, CId, ObjcObject
   -- ** Classes
   , CClass, ObjcClass
   -- ** Selectors
   , CSel, ObjcSelector
   -- ** Ivars
   , CIvar, ObjcIvar
-  -- ** Booleans
-  , CBool, toBool, fromBool
+  -- ** Protocols
+  , CProtocol, ObjcProtocol
   ) where
 
 import Data.Typeable
@@ -35,13 +36,16 @@ fromBool = fromIntegral . fromEnum
 
 -- | an opaque objective C selector struct
 data ObjcSelector deriving Typeable
+
 -- | SEL as used by objective C
 type CSel = Ptr ObjcSelector
 
 -- | a (semi-opaque) objective C object, known to have an isa field linking to the Class
 data ObjcObject deriving Typeable
+
 -- | An objective C 'id'
 type CId = Ptr ObjcObject
+
 -- | An objective C 'id' with potential finalizers
 type ForeignId = ForeignPtr ObjcObject
 
@@ -52,3 +56,7 @@ type CClass = Ptr ObjcClass
 -- | an opaque objective c ivar struct
 data ObjcIvar deriving Typeable
 type CIvar = Ptr ObjcIvar
+
+-- | an opaque objective c protocol struct
+data ObjcProtocol deriving Typeable
+type CProtocol = Ptr ObjcProtocol
