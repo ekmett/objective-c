@@ -9,8 +9,8 @@ maintainer:    Edward A. Kmett <ekmett@gmail.com>
 stability:     experimental
 homepage:      http://github.com/ekmett/objective-c/
 copyright:     Copyright (C) 2012 Edward A. Kmett
-synopsis:      Toy 64-bit Objective C 2.0 Bindings
-description:   Toy 64-bit Objective C 2.0 Bindings
+synopsis:      64-bit Objective C 2.0 Bindings for Mac OS X
+description:   64-bit Objective C 2.0 Bindings for Mac OS X
 build-type:    Simple
 
 source-repository head
@@ -18,11 +18,13 @@ source-repository head
   location: git://github.com/ekmett/objective-c.git
 
 library
+  ghc-options: -Wall
   build-depends:
     base             >= 4.5     && < 5,
     template-haskell >= 2.7     && < 2.8,
     hashable         >= 1.1.2.2 && < 1.2
 
+  extra-libraries: objc
   exposed-modules:
     Objective.C
     Objective.C.Prim
@@ -34,14 +36,16 @@ library
     Objective.C.Selector
     Objective.C.Util
 
-  include-dirs: cbits
+  -- NB: this requires that you run ghci -framework CoreFoundation to test this library
+  ghc-options: -framework CoreFoundation
+  exposed-modules:
+    Frameworks.CoreFoundation.Types
+    Frameworks.CoreFoundation.Version
 
-  includes:
-    cbits/objc_object.h
-    cbits/objc_nsobject.h
-
-  c-sources:
-    cbits/objc_object.c
-    cbits/objc_nsobject.c
-
-  ghc-options: -Wall
+--  include-dirs: cbits
+--  includes:
+--    cbits/objc_object.h
+--    cbits/objc_nsobject.h
+--  c-sources:
+--    cbits/objc_object.c
+--    cbits/objc_nsobject.c

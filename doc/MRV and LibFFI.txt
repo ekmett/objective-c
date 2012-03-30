@@ -1,0 +1,24 @@
+On Mac OSX 64-bit, I can't just use LibFFI to call everything.
+
+First, LibFFI's support for varargs functions is unstable and experimental.
+
+but more damningly, the APIs seem to rely on the ability to return large structs when operating in 64-bit.
+
+Consider:
+
+typedef signed long CFIndex;
+typedef struct {
+    CFIndex location;
+    CFIndex length;
+} CFRange;
+
+
+on 32 bit, this isn't a problem. long is 32 bit, long long is 64 bit, the structure passes through FFI effortlessly.
+
+
+Consider that on a 64-bit Mac OS X. Mac OS X uses an LP64 memory model (http://en.wikipedia.org/wiki/64-bit) which is
+to say both long and long long have 64 bit length.
+
+then look at the fact that a CFIndex is a signed long and a CFRange is a struct { CFIndex location, length }
+
+clearly we can't fit a CFRange into a long long, and yet the selectors used by the core foundation framework use them all over the place!
