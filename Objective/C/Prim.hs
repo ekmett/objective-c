@@ -9,13 +9,13 @@ module Objective.C.Prim
   -- ** Identities
   , ForeignId, CId, ObjcObject
   -- ** Classes
-  , CClass, ObjcClass
+  , ObjcClass
   -- ** Selectors
-  , CSel, ObjcSelector
+  , ObjcSelector
   -- ** Ivars
   , CIvar, ObjcIvar
   -- ** Protocols
-  , CProtocol, ObjcProtocol
+  , ObjcProtocol
   ) where
 
 import Data.Typeable
@@ -37,9 +37,6 @@ fromBool = fromIntegral . fromEnum
 -- | an opaque objective C selector struct
 data ObjcSelector deriving Typeable
 
--- | SEL as used by objective C
-type CSel = Ptr ObjcSelector
-
 -- | a (semi-opaque) objective C object, known to have an isa field linking to the Class
 data ObjcObject deriving Typeable
 
@@ -51,7 +48,6 @@ type ForeignId = ForeignPtr ObjcObject
 
 -- | an opaque objective c class struct
 data ObjcClass deriving Typeable
-type CClass = Ptr ObjcClass
 
 -- | an opaque objective c ivar struct
 data ObjcIvar deriving Typeable
@@ -59,4 +55,3 @@ type CIvar = Ptr ObjcIvar
 
 -- | an opaque objective c protocol struct
 data ObjcProtocol deriving Typeable
-type CProtocol = Ptr ObjcProtocol

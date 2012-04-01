@@ -24,7 +24,9 @@ library
     template-haskell >= 2.7     && < 2.8,
     hashable         >= 1.1.2.2 && < 1.2
 
-  extra-libraries: objc
+  extra-libraries: objc ffi
+  c-sources: cbits/ffi.c
+
   exposed-modules:
     Objective.C
     Objective.C.Prim
@@ -37,10 +39,11 @@ library
     Objective.C.Util
 
   -- NB: this requires that you run ghci -framework CoreFoundation to test this library
-  ghc-options: -framework CoreFoundation
-  exposed-modules:
-    Frameworks.CoreFoundation.Types
-    Frameworks.CoreFoundation.Version
+--  ghc-options: -framework CoreFoundation
+--  exposed-modules:
+--    Frameworks.CoreFoundation.Types
+--    Frameworks.CoreFoundation.Version
+
 
 --  include-dirs: cbits
 --  includes:

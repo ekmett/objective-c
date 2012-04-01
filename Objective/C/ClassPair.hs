@@ -5,20 +5,17 @@ module Objective.C.ClassPair
 
 import qualified System.IO.Unsafe as Unsafe
 import Foreign.C.String
-import Objective.C.Prim
 import Objective.C.Class
 
-foreign import ccall unsafe "objc/runtime.h objc_getClass" c_objc_getClass :: CString -> IO CClass
--- foreign import ccall unsafe "objc/runtime.h objc_getMetaClass" c_objc_getMetaClass :: CString -> IO CClass
+foreign import ccall unsafe "objc/runtime.h" objc_getClass :: CString -> IO (Class a)
+-- foreign import ccall unsafe "objc/runtime.h" objc_getMetaClass :: CString -> IO (Class a)
 
 class ClassPair a where
   getClassNameByProxy :: p a -> String
 
   getClass :: Class a
   getClass = r where
-    r = Unsafe.unsafePerformIO $ do
-      c <- withCString (getClassNameByProxy r) c_objc_getClass
-      return $ Class c
+    r = Unsafe.unsafePerformIO $ withCString (getClassNameByProxy r) objc_getClass
 
 {-
   getMetaClass :: Class (Class a)

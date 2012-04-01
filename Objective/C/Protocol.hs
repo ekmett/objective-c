@@ -28,19 +28,21 @@ import Foreign.Storable
 import qualified System.IO.Unsafe as Unsafe
 import Text.Read
 
-foreign import ccall unsafe "objc/runtime.h class_addProtocol"           c_class_addProtocol           :: CClass -> CProtocol -> IO ()
-foreign import ccall unsafe "objc/runtime.h class_conformsToProtocol"    c_class_conformsToProtocol    :: CClass -> CProtocol -> IO CBool
-foreign import ccall unsafe "objc/runtime.h class_copyProtocolList"      c_class_copyProtocolList      :: CClass -> Ptr CInt -> IO (Ptr CProtocol)
-foreign import ccall unsafe "objc/runtime.h objc_allocateProtocol"       c_objc_allocateProtocol       :: CString -> IO CProtocol
-foreign import ccall unsafe "objc/runtime.h objc_copyProtocolList"       c_objc_copyProtocolList       :: Ptr CInt -> IO (Ptr CProtocol)
-foreign import ccall unsafe "objc/runtime.h objc_getProtocol"            c_objc_getProtocol            :: CString -> IO CProtocol
-foreign import ccall unsafe "objc/runtime.h objc_registerProtocol"       c_objc_registerProtocol       :: CProtocol -> IO ()
-foreign import ccall unsafe "objc/runtime.h protocol_addProtocol"        c_protocol_addProtocol        :: CProtocol -> CProtocol -> IO ()
-foreign import ccall unsafe "objc/runtime.h protocol_conformsToProtocol" c_protocol_conformsToProtocol :: CProtocol -> CProtocol -> IO CBool
-foreign import ccall unsafe "objc/runtime.h protocol_copyProtocolList"   c_protocol_copyProtocolList   :: CProtocol -> Ptr CInt -> IO (Ptr CProtocol)
-foreign import ccall unsafe "objc/runtime.h protocol_getName"            c_protocol_getName            :: CProtocol -> IO CString
+foreign import ccall unsafe "objc/runtime.h" class_addProtocol           :: Class a -> Protocol -> IO ()
+foreign import ccall unsafe "objc/runtime.h" class_conformsToProtocol    :: Class a -> Protocol -> IO CBool
+foreign import ccall unsafe "objc/runtime.h" class_copyProtocolList      :: Class a -> Ptr CInt -> IO (Ptr Protocol)
+foreign import ccall unsafe "objc/runtime.h" objc_allocateProtocol       :: CString -> IO Protocol
+foreign import ccall unsafe "objc/runtime.h" objc_copyProtocolList       :: Ptr CInt -> IO (Ptr Protocol)
+foreign import ccall unsafe "objc/runtime.h" objc_getProtocol            :: CString -> IO Protocol
+foreign import ccall unsafe "objc/runtime.h" protocol_addProtocol        :: Protocol -> Protocol -> IO ()
+foreign import ccall unsafe "objc/runtime.h" protocol_conformsToProtocol :: Protocol -> Protocol -> IO CBool
+foreign import ccall unsafe "objc/runtime.h" protocol_copyProtocolList   :: Protocol -> Ptr CInt -> IO (Ptr Protocol)
+foreign import ccall unsafe "objc/runtime.h" protocol_getName            :: Protocol -> IO CString
 
-newtype Protocol = Protocol CProtocol deriving (Eq,Ord,Data,Typeable,Nil,Storable)
+-- | register the protocol with the Objective C runtime
+foreign import ccall unsafe "objc/runtime.h objc_registerProtocol" registerProtocol :: Protocol -> IO ()
+
+newtype Protocol = Protocol (Ptr ObjcProtocol) deriving (Eq,Ord,Data,Typeable,Nil,Storable)
 
 instance Hashable Protocol where
   hashWithSalt n (Protocol s) = n `hashWithSalt` (fromIntegral (ptrToIntPtr s) :: Int)
@@ -62,11 +64,11 @@ instance Read Protocol where
     )
 
 instance Named Protocol where
-  name (Protocol p) = Unsafe.unsafePerformIO $ c_protocol_getName p >>= peekCString
+  name p = Unsafe.unsafePerformIO $ protocol_getName p >>= peekCString
 
 -- | Retrieve a protocol with a given name, or nil if it isn't present
 getProtocol :: String -> IO Protocol
-getProtocol n = Protocol <$> withCString n c_objc_getProtocol
+getProtocol n = withCString n objc_getProtocol
 
 -- | Only used internally, assumes that the protocol already exists. If this protocol isn't being
 -- supplied by an external framework, use getProtocol to be safe.
@@ -75,15 +77,11 @@ protocol = Unsafe.unsafePerformIO . getProtocol
 
 -- | return the current global protocol list
 protocols :: IO [Protocol]
-protocols = copyProtocols c_objc_copyProtocolList
+protocols = copyProtocols objc_copyProtocolList
 
 -- | allocate space for a new protocol
 allocateProtocol :: String -> IO Protocol
-allocateProtocol n = Protocol <$> withCString n c_objc_allocateProtocol
-
--- | register the protocol with the Objective C runtime
-registerProtocol :: Protocol -> IO ()
-registerProtocol (Protocol p) = c_objc_registerProtocol p
+allocateProtocol n = withCString n objc_allocateProtocol
 
 class HasProtocols t where
   conformsToProtocol :: t -> Protocol -> IO Bool
@@ -91,20 +89,20 @@ class HasProtocols t where
   addProtocol        :: t -> Protocol -> IO ()
 
 instance HasProtocols (Class a) where
-  conformsToProtocol (Class c) (Protocol p) = toBool <$> c_class_conformsToProtocol c p
-  protocolsOf (Class c) = copyProtocols (c_class_copyProtocolList c)
-  addProtocol (Class c) (Protocol p) = c_class_addProtocol c p
+  conformsToProtocol c p = toBool <$> class_conformsToProtocol c p
+  protocolsOf c = copyProtocols (class_copyProtocolList c)
+  addProtocol = class_addProtocol
 
 instance HasProtocols Protocol where
-  conformsToProtocol (Protocol p) (Protocol q) = toBool <$> c_protocol_conformsToProtocol p q
-  protocolsOf (Protocol p) = copyProtocols (c_protocol_copyProtocolList p)
-  addProtocol (Protocol p) (Protocol q) = c_protocol_addProtocol p q
+  conformsToProtocol p q = toBool <$> protocol_conformsToProtocol p q
+  protocolsOf p = copyProtocols (protocol_copyProtocolList p)
+  addProtocol = protocol_addProtocol
 
 -- private helper
-copyProtocols :: (Ptr CInt -> IO (Ptr CProtocol)) -> IO [Protocol]
+copyProtocols :: (Ptr CInt -> IO (Ptr Protocol)) -> IO [Protocol]
 copyProtocols f = alloca $ \p -> do
   ps <- f p
   count <- peek p
-  xs <- forM [0..fromIntegral count-1] $ \i -> Protocol <$> peekElemOff ps i
+  xs <- forM [0..fromIntegral count-1] $ peekElemOff ps
   free ps
   return xs
